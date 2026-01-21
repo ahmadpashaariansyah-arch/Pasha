@@ -1,0 +1,486 @@
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JKT48 Jikosokai Game - Siapakah Ini??</title>
+    <style>
+        :root {
+            --primary: #f06292;
+            --secondary: #ec407a;
+            --accent: #f8bbd0;
+            --dark: #880e4f;
+            --light: #ffebee;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light), var(--accent));
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 4px;
+            background: var(--primary);
+            bottom: -5px;
+            left: 20%;
+            border-radius: 2px;
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: var(--light);
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        
+        .game-area {
+            margin: 30px 0;
+        }
+        
+        .photo-container {
+            position: relative;
+            width: 80%;
+            max-width: 400px;
+            margin: 0 auto 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            aspect-ratio: 1/1;
+        }
+        
+        .member-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s;
+        }
+        
+        .blurred {
+            filter: blur(15px) brightness(1.1);
+        }
+        
+        .reveal-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .reveal-btn:hover {
+            background-color: var(--secondary);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .option {
+            background-color: white;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .option:hover {
+            background-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .correct {
+            background-color: #a5d6a7;
+            border-color: #66bb6a;
+        }
+        
+        .incorrect {
+            background-color: #ef9a9a;
+            border-color: #ef5350;
+        }
+        
+        .next-btn {
+            margin-top: 30px;
+            background-color: var(--dark);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .next-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        
+        .hint-btn {
+            margin-top: 20px;
+            background-color: var(--light);
+            border: 1px solid var(--primary);
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .hint-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .hint-text {
+            margin-top: 15px;
+            font-style: italic;
+            color: var(--dark);
+            display: none;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .game-over-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .game-over h2 {
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+        
+        .restart-btn {
+            margin-top: 30px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .restart-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .photo-container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JKT48 Jikosokai Game - Siapakah Ini??</h1>
+        
+        <div class="score-container">
+            <div class="score">Skor: <span id="score">0</span></div>
+            <div class="question-count">Pertanyaan: <span id="question-count">1</span>/10</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="game-area">
+            <div class="photo-container">
+                <img src="" alt="Foto Member JKT48" class="member-photo blurred" id="member-photo" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/66fff5c1-1a17-415b-bb2b-e49381892745.png">
+                <button class="reveal-btn" id="reveal-btn">Tunjukkan Foto</button>
+            </div>
+            
+            <button class="hint-btn" id="hint-btn">Minta Hint</button>
+            <div class="hint-text" id="hint-text"></div>
+            
+            <div class="options-container" id="options-container"></div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <button class="next-btn" id="next-btn">Lanjutkan</button>
+        </div>
+    </div>
+    
+    <div class="game-over" id="game-over">
+        <div class="game-over-content">
+            <h2>Permainan Selesai!</h2>
+            <p>Skor akhir kamu: <span id="final-score">0</span> dari 10</p>
+            <button class="restart-btn" id="restart-btn">Main Lagi</button>
+        </div>
+    </div>
+    
+    <script>
+        // Data member JKT48 (nama dan foto)
+        const members = [
+            { name: "Zee JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Zee+JKT48", hint: "Generasi 10, dijuluki 'Oneesan'" },
+            { name: "Shani JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Shani+JKT48", hint: "Generasi 3, mantan kapten JKT48" },
+            { name: "Gracia JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Gracia+JKT48", hint: "Generasi 3, dijuluki 'Oshi G'" },
+            { name: "Freya JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Freya+JKT48", hint: "Generasi 8, memiliki tinggi 170cm" },
+            { name: "Muthe JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Muthe+JKT48", hint: "Generasi 10, nama asli Mutiara" },
+            { name: "Fiony JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Fiony+JKT48", hint: "Generasi 8, dijuluki 'Kue Sagu'" },
+            { name: "Eli JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Eli+JKT48", hint: "Generasi 9, berasal dari Makassar" },
+            { name: "Olla JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Olla+JKT48", hint: "Generasi 9, mantan Trainee" },
+            { name: "Lulu JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Lulu+JKT48", hint: "Generasi 9, bungsu team KIII" },
+            { name: "Adel JKT48", photo: "https://via.placeholder.com/400/ffebee/880e4f?text=Adel+JKT48", hint: "Generasi 10, anggota termuda" }
+        ];
+        
+        // Variabel game state
+        let currentMember = null;
+        let score = 0;
+        let currentQuestion = 1;
+        const totalQuestions = 10;
+        let gameActive = true;
+        let revealed = false;
+        
+        // Element references
+        const memberPhoto = document.getElementById('member-photo');
+        const revealBtn = document.getElementById('reveal-btn');
+        const optionsContainer = document.getElementById('options-container');
+        const scoreElement = document.getElementById('score');
+        const questionCountElement = document.getElementById('question-count');
+        const feedbackElement = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const hintBtn = document.getElementById('hint-btn');
+        const hintText = document.getElementById('hint-text');
+        const progressBar = document.getElementById('progress-bar');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreElement = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        
+        // Fungsi untuk memulai permainan baru
+        function startGame() {
+            score = 0;
+            currentQuestion = 1;
+            gameActive = true;
+            updateScore();
+            loadQuestion();
+        }
+        
+        // Fungsi untuk memuat pertanyaan baru
+        function loadQuestion() {
+            if (currentQuestion > totalQuestions) {
+                endGame();
+                return;
+            }
+            
+            // Reset state
+            revealed = false;
+            hintText.style.display = 'none';
+            nextBtn.style.display = 'none';
+            feedbackElement.textContent = '';
+            optionsContainer.innerHTML = '';
+            
+            // Update tampilan
+            questionCountElement.textContent = currentQuestion;
+            progressBar.style.width = `${(currentQuestion-1)/totalQuestions*100}%`;
+            
+            // Pilih member secara acak sebagai jawaban benar
+            const correctIndex = Math.floor(Math.random() * members.length);
+            currentMember = members[correctIndex];
+            memberPhoto.src = currentMember.photo;
+            memberPhoto.classList.add('blurred');
+            revealBtn.style.display = 'block';
+            
+            // Pilih 3 member lain sebagai opsi salah + gabungkan
+            const options = [currentMember.name];
+            const usedIndices = [correctIndex];
+            
+            while (options.length < 4) {
+                const randomIndex = Math.floor(Math.random() * members.length);
+                if (!usedIndices.includes(randomIndex)) {
+                    options.push(members[randomIndex].name);
+                    usedIndices.push(randomIndex);
+                }
+            }
+            
+            // Acak urutan opsi
+            options.sort(() => Math.random() - 0.5);
+            
+            // Buat tombol opsi
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option';
+                button.textContent = option;
+                button.addEventListener('click', () => checkAnswer(option));
+                optionsContainer.appendChild(button);
+            });
+        }
+        
+        // Fungsi untuk memeriksa jawaban
+        function checkAnswer(selectedAnswer) {
+            if (!gameActive || revealed) return;
+            
+            const options = Array.from(document.querySelectorAll('.option'));
+            options.forEach(option => {
+                option.disabled = true;
+                if (option.textContent === currentMember.name) {
+                    option.classList.add('correct');
+                } else if (option.textContent === selectedAnswer && selectedAnswer !== currentMember.name) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedAnswer === currentMember.name) {
+                score++;
+                updateScore();
+                feedbackElement.textContent = 'Benar! ★';
+                feedbackElement.style.color = 'green';
+            } else {
+                feedbackElement.textContent = `Salah! Jawaban benar: ${currentMember.name}`;
+                feedbackElement.style.color = 'red';
+            }
+            
+            memberPhoto.classList.remove('blurred');
+            revealBtn.style.display = 'none';
+            nextBtn.style.display = 'block';
+            revealed = true;
+        }
+        
+        // Fungsi untuk menampilkan hint
+        hintBtn.addEventListener('click', () => {
+            if (!revealed) {
+                hintText.textContent = `Hint: ${currentMember.hint}`;
+                hintText.style.display = 'block';
+            }
+        });
+        
+        // Fungsi untuk memperbarui skor
+        function updateScore() {
+            scoreElement.textContent = score;
+        }
+        
+        // Fungsi ketika permainan selesai
+        function endGame() {
+            gameActive = false;
+            finalScoreElement.textContent = score;
+            gameOverScreen.style.display = 'flex';
+            progressBar.style.width = '100%';
+        }
+        
+        // Event listeners
+        revealBtn.addEventListener('click', () => {
+            memberPhoto.classList.remove('blurred');
+            revealBtn.style.display = 'none';
+            revealed = true;
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            currentQuestion++;
+            loadQuestion();
+        });
+        
+        restartBtn.addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            startGame();
+        });
+        
+        // Mulai permainan
+        startGame();
+    </script>
+</body>
+</html>
+
